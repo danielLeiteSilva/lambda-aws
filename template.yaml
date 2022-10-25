@@ -1,0 +1,37 @@
+Transform: AWS::Serverless-2016-10-31
+
+Description:
+  Exemplo SAM Lambda Com evento de execução
+Parameters:
+  SufixoFuncao:
+    Type: String
+    Default: fernandosousa
+Globals:
+  Function:
+    Timeout: 30 # tempo máximo de execução da função, em segundos
+Resources:
+  HelloSamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub hello-sam-function-${SufixoFuncao} # nome da função
+      Description: Exemplo funcao lambda
+      CodeUri: ./app # localização local do código da função
+      Handler: lambda_function.lambda_handler # nome do arquivo e nome da função que será executada
+      Runtime: python3.9 # runtime de execução
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/LabRole # Papel de execução - permissão para acessar serviços da AWS
+      FunctionUrlConfig: # url da funcao
+        AuthType: NONE
+        Cors:
+          AllowMethods:
+            - "GET"
+            - "POST"
+          AllowOrigins:
+            - "*"
+Outputs:
+  NomeFuncao:
+    Description: Nome da função criada
+    Value: !Ref HelloSamFunction
+  FunctionUrlEndpoint:
+      Description: URL do endpoint da Funcao
+      Value:
+        Fn::GetAtt: HelloSamFunctionUrl.FunctionUrl
